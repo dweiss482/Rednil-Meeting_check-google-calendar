@@ -25,12 +25,9 @@
     }
 
     * { box-sizing: border-box; }
-
     html, body { height: 100%; }
 
-    /* IFRAME-FRIENDLY:
-       - Avoid forcing 100vh layouts that can clip inside iframes.
-       - Keep it compact with controlled padding. */
+    /* Iframe-friendly: no forced 100vh layouts, compact padding */
     body{
       margin: 0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
@@ -40,22 +37,19 @@
         radial-gradient(900px 620px at 85% 70%, rgba(211,162,74,0.14), transparent 58%),
         linear-gradient(180deg, var(--bg0), var(--bg1));
       overflow-x: hidden;
-      overflow-y: auto;
     }
 
-    /* Animated background canvas */
+    /* Background */
     #bg {
       position: fixed;
       inset: 0;
       width: 100%;
       height: 100%;
-      display: block;
       z-index: 0;
       pointer-events: none;
       opacity: 0.95;
     }
 
-    /* Soft vignette to focus center */
     .vignette {
       position: fixed;
       inset: 0;
@@ -67,20 +61,19 @@
       opacity: 0.55;
     }
 
-    /* Layout wrapper: compact vertical padding so it doesn't get too tall */
+    /* Wrapper: minimal vertical padding to avoid tall iframes */
     .wrap{
       position: relative;
       z-index: 2;
       width: 100%;
-      padding: clamp(10px, 2.2vw, 18px);
+      padding: clamp(10px, 2vw, 16px);
       display: flex;
       justify-content: center;
       align-items: center;
     }
 
-    /* Card is intentionally compact to fit inside iframes */
     .card{
-      width: min(880px, 96vw);
+      width: min(920px, 96vw);
       background: var(--card);
       border: 1px solid var(--card-border);
       border-radius: var(--radius);
@@ -90,56 +83,90 @@
       overflow: hidden;
     }
 
+    /* Responsive structure:
+       - mobile: stacked
+       - wider: 2-column (logo left, content right) to reduce height */
     .inner{
-      padding: clamp(16px, 2.2vw, 22px);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      text-align: center;
+      padding: clamp(14px, 2.2vw, 20px);
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1fr;
+      align-items: center;
     }
 
-    /* Contrast fix: logo on a bright glass panel */
+    @media (min-width: 820px){
+      .inner{
+        grid-template-columns: 360px 1fr;
+        gap: 18px;
+      }
+    }
+
+    /* Logo panel: constrain width + height so it never overwhelms */
     .logo-panel{
-      display: inline-flex;
+      display: flex;
       justify-content: center;
       align-items: center;
-      padding: clamp(14px, 2vw, 20px) clamp(16px, 2.4vw, 26px);
+      padding: clamp(12px, 1.6vw, 16px);
       border-radius: 16px;
       background: rgba(255,255,255,0.88);
       box-shadow:
         0 10px 24px rgba(0,0,0,0.35),
         inset 0 0 0 1px rgba(0,0,0,0.06);
-      margin: 2px auto 0;
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
     }
 
+    /* THIS is the important part: responsive logo sizing */
     .logo-panel img{
-      width: min(520px, 78vw);
-      max-width: 520px;
-      height: auto;
       display: block;
+      width: 100%;
+      height: auto;
+      max-width: 460px;                 /* caps width on large screens */
+      max-height: clamp(70px, 10vw, 110px); /* caps height, scales down in iframes */
+      object-fit: contain;
+    }
+
+    .content{
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    @media (min-width: 820px){
+      .content{
+        text-align: left;
+      }
     }
 
     h1{
-      margin: 2px 0 0;
-      font-size: clamp(18px, 2.4vw, 26px);
+      margin: 0;
+      font-size: clamp(18px, 2.2vw, 26px);
       line-height: 1.15;
       letter-spacing: 0.2px;
     }
 
     p{
-      margin: 0 auto;
-      max-width: 68ch;
+      margin: 0;
       color: var(--muted);
-      font-size: clamp(13px, 1.6vw, 15px);
+      font-size: clamp(13px, 1.5vw, 15px);
       line-height: 1.5;
+      max-width: 70ch;
     }
 
     .actions{
       display: flex;
       flex-direction: column;
-      align-items: center;
       gap: 8px;
-      margin-top: 4px;
+      margin-top: 2px;
+      align-items: center;
+    }
+
+    @media (min-width: 820px){
+      .actions{
+        align-items: flex-start;
+      }
     }
 
     .btn{
@@ -155,7 +182,8 @@
         linear-gradient(135deg, rgba(43,119,196,0.92), rgba(43,119,196,0.72)) padding-box,
         linear-gradient(135deg, rgba(211,162,74,0.90), rgba(43,119,196,0.90)) border-box;
       box-shadow: 0 12px 28px rgba(0,0,0,0.32);
-      min-width: min(320px, 88vw);
+      width: 100%;
+      max-width: 340px;
       transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
     }
 
@@ -175,35 +203,35 @@
       color: rgba(255,255,255,0.62);
     }
 
-    /* Keep the tips compact; switch to two columns on wider screens */
+    /* Tips: keep compact and prevent height explosion */
     .tips{
       margin-top: 6px;
-      padding-top: 12px;
+      padding-top: 10px;
       border-top: 1px solid rgba(255,255,255,0.10);
       display: grid;
-      gap: 10px;
-      text-align: left;
+      gap: 8px;
     }
 
-    @media (min-width: 720px){
+    @media (min-width: 820px){
       .tips{
         grid-template-columns: 1fr 1fr;
+        gap: 10px 14px;
       }
     }
 
     .tip{
       display: grid;
-      grid-template-columns: 14px 1fr;
+      grid-template-columns: 12px 1fr;
       gap: 10px;
       align-items: start;
       color: rgba(255,255,255,0.78);
-      font-size: 13.5px;
-      line-height: 1.4;
+      font-size: 13px;
+      line-height: 1.35;
     }
 
     .dot{
-      width: 9px;
-      height: 9px;
+      width: 8px;
+      height: 8px;
       margin-top: 5px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--accent2), var(--accent));
@@ -211,12 +239,11 @@
     }
 
     footer{
-      margin-top: 4px;
+      margin-top: 2px;
       font-size: 12px;
       color: rgba(255,255,255,0.50);
     }
 
-    /* Reduced motion support */
     @media (prefers-reduced-motion: reduce){
       #bg{ display:none; }
       .btn{ transition: none; }
@@ -239,59 +266,60 @@
           />
         </div>
 
-        <h1>Check your Google Calendar for event details</h1>
+        <div class="content">
+          <h1>Check your Google Calendar for event details</h1>
 
-        <p>
-          Your meeting links, instructions, and timing are listed inside the calendar event.
-          Open Google Calendar and review today’s (or upcoming) events.
-        </p>
+          <p>
+            Your meeting links, instructions, and timing are listed inside the calendar event.
+            Open Google Calendar and review today’s (or upcoming) events.
+          </p>
 
-        <div class="actions">
-          <button class="btn" id="openCalendar" type="button">
-            Open Google Calendar
-          </button>
-          <div class="subnote">
-            If you use multiple Google accounts, confirm you’re signed into the correct one.
+          <div class="actions">
+            <button class="btn" id="openCalendar" type="button">
+              Open Google Calendar
+            </button>
+            <div class="subnote">
+              If you use multiple Google accounts, confirm you’re signed into the correct one.
+            </div>
           </div>
+
+          <div class="tips" aria-label="What to look for">
+            <div class="tip">
+              <span class="dot" aria-hidden="true"></span>
+              <span>Open the event and read the <strong>Description</strong> for links and instructions.</span>
+            </div>
+
+            <div class="tip">
+              <span class="dot" aria-hidden="true"></span>
+              <span>Confirm the <strong>time zone</strong> and the <strong>video link/location</strong> field.</span>
+            </div>
+
+            <div class="tip">
+              <span class="dot" aria-hidden="true"></span>
+              <span>If you don’t see it, check other calendars in the sidebar or search the event name.</span>
+            </div>
+
+            <div class="tip">
+              <span class="dot" aria-hidden="true"></span>
+              <span>If Calendar won’t load, refresh or sign into Google in a new tab.</span>
+            </div>
+          </div>
+
+          <footer>
+            Note: Some meeting links may only appear after you accept the invite.
+          </footer>
         </div>
-
-        <div class="tips" aria-label="What to look for">
-          <div class="tip">
-            <span class="dot" aria-hidden="true"></span>
-            <span>Open the event and read the <strong>Description</strong> for links and instructions.</span>
-          </div>
-
-          <div class="tip">
-            <span class="dot" aria-hidden="true"></span>
-            <span>Confirm the <strong>time zone</strong> and the <strong>video link/location</strong> field.</span>
-          </div>
-
-          <div class="tip">
-            <span class="dot" aria-hidden="true"></span>
-            <span>If you don’t see it, check other calendars in the sidebar or search the event name.</span>
-          </div>
-
-          <div class="tip">
-            <span class="dot" aria-hidden="true"></span>
-            <span>If Calendar won’t load, refresh or sign into Google in a new tab.</span>
-          </div>
-        </div>
-
-        <footer>
-          Note: Some meeting links may only appear after you accept the invite.
-        </footer>
 
       </div>
     </section>
   </main>
 
   <script>
-    // Open Google Calendar
     document.getElementById("openCalendar").addEventListener("click", () => {
       window.open("https://calendar.google.com/", "_blank", "noopener,noreferrer");
     });
 
-    // Subtle animated background (compact + lightweight)
+    // Subtle animated background (lighter density for iframe performance)
     const canvas = document.getElementById("bg");
     const ctx = canvas.getContext("2d", { alpha: true });
 
@@ -310,26 +338,18 @@
     window.addEventListener("resize", resize, { passive: true });
     resize();
 
-    const COUNT = Math.floor(Math.min(70, Math.max(35, (w * h) / 36000)));
+    const COUNT = Math.floor(Math.min(55, Math.max(28, (w * h) / 45000)));
     const palette = [
-      { r: 43,  g: 119, b: 196, a: 0.30 }, // blue
-      { r: 211, g: 162, b: 74,  a: 0.26 }, // gold
-      { r: 255, g: 255, b: 255, a: 0.12 }  // soft white
+      { r: 43,  g: 119, b: 196, a: 0.26 },
+      { r: 211, g: 162, b: 74,  a: 0.22 },
+      { r: 255, g: 255, b: 255, a: 0.10 }
     ];
 
     function rand(min, max){ return Math.random() * (max - min) + min; }
 
     const particles = Array.from({ length: COUNT }, () => {
       const c = palette[Math.floor(Math.random() * palette.length)];
-      return {
-        x: rand(0, w),
-        y: rand(0, h),
-        r: rand(10, 28),
-        vx: rand(-0.14, 0.14),
-        vy: rand(-0.09, 0.10),
-        c,
-        phase: rand(0, Math.PI * 2)
-      };
+      return { x: rand(0, w), y: rand(0, h), r: rand(10, 26), vx: rand(-0.12, 0.12), vy: rand(-0.08, 0.09), c, phase: rand(0, Math.PI * 2) };
     });
 
     let last = performance.now();
@@ -339,11 +359,10 @@
 
       ctx.clearRect(0, 0, w, h);
 
-      // Soft wash
       const wash = ctx.createRadialGradient(w*0.28, h*0.25, 60, w*0.28, h*0.25, Math.max(w,h));
-      wash.addColorStop(0, "rgba(43,119,196,0.07)");
-      wash.addColorStop(0.6, "rgba(0,0,0,0)");
-      wash.addColorStop(1, "rgba(211,162,74,0.05)");
+      wash.addColorStop(0, "rgba(43,119,196,0.06)");
+      wash.addColorStop(0.62, "rgba(0,0,0,0)");
+      wash.addColorStop(1, "rgba(211,162,74,0.045)");
       ctx.fillStyle = wash;
       ctx.fillRect(0, 0, w, h);
 
@@ -352,13 +371,12 @@
         p.x += p.vx * (60 * dt);
         p.y += p.vy * (60 * dt);
 
-        // wrap
         if (p.x < -60) p.x = w + 60;
         if (p.x > w + 60) p.x = -60;
         if (p.y < -60) p.y = h + 60;
         if (p.y > h + 60) p.y = -60;
 
-        const pulse = 0.75 + 0.25 * Math.sin(p.phase);
+        const pulse = 0.76 + 0.24 * Math.sin(p.phase);
         const radius = p.r * pulse;
 
         const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius);
